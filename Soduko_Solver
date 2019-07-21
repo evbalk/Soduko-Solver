@@ -117,8 +117,6 @@ while 0 in master_arr[0, :, :] and repeats < 1:
                             update_puzzle(pz_size, master_arr)
                             # print(master_arr[0,:,:])
 
-
-
     repeats += 1
     print(repeats)
 print("-----------\n")
