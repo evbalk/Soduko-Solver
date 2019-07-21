@@ -20,7 +20,6 @@ assert float(int(l ** (1 / 2))) == float(l ** (1 / 2)), "Cannot use non perfect 
 
 '''Set range of numbers in puzzle'''
 pz_size = l
-num_list = [x + 1 for x in range(pz_size)]
 
 '''Returns a 9x9 array which holds the square number for each location'''
 
@@ -92,30 +91,44 @@ options = 0
 options_list = []
 updates = 0
 repeats = 0
-while 0 in master_arr[0, :, :] and repeats < 1:
+changes1 = 0
+changes2 = 1
+while 0 in master_arr[0, :, :] and repeats < 20 and changes1 != changes2: # runs while there are empty spots or 81 iterations or there is no change
+    if repeats==0: changes2 =0
+    changes1 = changes2
     for row in range(pz_size):  # rows 1,4/9
-        for colmn in range(pz_size):
+        for colmn in range(pz_size):  # col 1-9
             options = 0
-            options_list=[]
-            if master_arr[0, row, colmn] == 0:
-                for depths in range(1, pz_size + 1):
-                    if master_arr[depths, row, colmn] != 0:
+            options_list = []
+            if master_arr[0, row, colmn] == 0:  # if this spot is empty in depth 0
+                for depths in range(1, pz_size + 1):  # run through each depth at this r,c
+                    if master_arr[depths, row, colmn] != 0:  # count how many non-zero entries AKA possibilities exist
                         options += 1
                         options_list.append(depths)
-            if options == 1:
+            if options == 1:  # if only one option then update
                 updates += 1
                 master_arr[:, row, colmn] = options_list[0]
                 update_puzzle(pz_size, master_arr)
-                print(master_arr[0, :, :])
-            elif options > 1:
-                for depths in options_list:  # run through each option
-                    if np.count_nonzero(master_arr[depths, row,:] == depths) == 1:  # if for a given option, say 3, this location is the only possible location for 3 in the row then you have to add it
-                        updates += 1
-                        master_arr[:, row, colmn] = depths
-                        update_puzzle(pz_size, master_arr)
-                        # print(master_arr[0,:,:])
+            elif options > 1:  # if multiple options
+                run_through = 0
+                while run_through < len(options_list):
+                    for depths1 in options_list:  # run through each option
+                        if np.count_nonzero(master_arr[depths1, row,:] == depths1) == 1:  # if for a given option, say 3, this location is the only possible location for 3 in the row then you have to add it
+                            updates += 1
+                            master_arr[:, row, colmn] = depths1
+                            update_puzzle(pz_size, master_arr)
+                            options_list.remove(depths1)
+                        elif np.count_nonzero(master_arr[depths1, :, colmn] == depths1) == 1: # code breaks when using this
+                            updates += 1
+                            master_arr[:, row, colmn] = depths1
+                            update_puzzle(pz_size, master_arr)
+                            options_list.remove(depths1)
+                        run_through += 1
+
+    changes2 = updates
+    print("Iteration:", repeats)
     repeats += 1
-    print(repeats)
+    print("before %d after %d" % (changes1, changes2))
+
 print("-----------\n")
-print(master_arr[:, :, :])
 
