@@ -1,0 +1,109 @@
+import numpy as np
+#easy 4X4
+#puzzle = np.array([(0, 0, 4, 0), (1, 0, 0, 0), (0, 2, 0, 0), (0, 0, 0, 3)])
+
+#hard 9x9
+#puzzle = np.array([(0,0,0,0,0,0,6,8,0),(0,0,0,0,7,3,0,0,9),(3,0,9,0,0,0,0,4,5),(4,9,0,0,0,0,0,0,0),(8,0,3,0,5,0,9,0,2),(0,0,0,0,0,0,0,3,6),(9,6,0,0,0,0,3,0,8),(7,0,0,6,8,0,0,0,0),(0,2,8,0,0,0,0,0,0)])
+
+#easy 9x9
+puzzle = np.array([(0,0,1,0,8,3,0,7,6),(0,7,0,4,0,0,2,1,0),(6,0,9,0,0,0,0,8,0),(5,4,3,0,9,1,0,6,0),(2,0,0,8,5,0,7,0,9),(0,0,8,6,3,0,0,4,5),(9,5,0,0,7,0,0,0,1),(3,0,0,2,0,5,4,0,0),(1,8,2,0,0,6,3,0,0)])
+'''Check to see if array is square, not 0x0'''
+l, w = np.shape(puzzle)
+assert l == w, "Puzzle shape is not square"
+assert l > 0, "Puzzle cannot be 0x0"
+assert float(int(l ** (1 / 2))) == float(l ** (1 / 2)), "Cannot use non perfect square sizes"
+
+'''Set range of numbers in puzzle'''
+pz_size = l
+num_list = [x + 1 for x in range(pz_size)]
+
+'''Returns a 9x9 array which holds the square number for each location'''
+
+
+def square_boundaries(size):
+    loc_arr = np.zeros((size, size))
+    sqrt = int((size) ** (1 / 2))
+    for r in range(size):
+        for c in range(size):
+            loc_arr[r, c] = c // sqrt + sqrt * (r // sqrt)
+    return loc_arr
+
+
+square_divy = square_boundaries(pz_size)
+
+'''Returns the square the row,column coordinate belongs too'''
+
+
+def which_square(row, column, loc_arr):
+    square = loc_arr[row, column]
+    return square
+
+
+'''Tells is the number is already in that square (if so, it can't be placed there). Returns True if already present, False if empty'''
+
+
+def in_square(number, row, col, size, master_array):
+    box_layout = square_boundaries(size)  # gets layout of which locations are in each box
+    my_square = which_square(row, col, box_layout)  # figures out which box this r,c is
+    this_square = []
+    status = False
+    for row in range(size):
+        for col in range(size):
+            if box_layout[
+                row, col] == my_square:  # runs through the box layout and records which r,c are in the box (4 or 9)
+                this_square.append((row, col))
+    for loc in this_square:  # runs through each location in the box, sees if the number is present in one of these locations, if it is not then we are ok to add it
+        row, col = loc
+        if number == master_array[0, row, col]:
+            status = True
+            break
+    return status
+
+
+master_arr = np.zeros((pz_size + 1, pz_size, pz_size))
+master_arr = master_arr.astype(int)
+master_arr[:, :, :] = puzzle
+
+'''Initial set up of each depth'''
+
+
+def update_puzzle(size, puzzle_array):
+    for i in range(1, size + 1):  # 1-4/9
+        puzzle_array[i, :, :] = 0
+        for rw in range(size):
+            for col in range(size):
+                if i not in puzzle_array[0, rw, :]:  # checks rows for the number
+                    if i not in puzzle_array[0, :, col]:  # checks each column for the number
+                        if not in_square(i, rw, col, size, master_arr):
+                            if puzzle_array[0, rw, col] == 0:  # is the specific location not already occupied/solved
+                                puzzle_array[i, rw, col] = i
+    return puzzle_array
+
+
+'''Run through depth 0 until no zeros are present. Moves across col, then down rows, then through numbers'''
+# update_master(pz_size,master_arr)
+update_puzzle(pz_size, master_arr)
+options = 0
+options_list = []
+updates = 0
+repeats = 0
+while 0 in master_arr[0,:,:]:
+    for num in range(1, pz_size + 1):
+        for row in range(pz_size):  # rows 1,4/9
+            for colmn in range(pz_size):
+                options = 0
+                options_list.clear()
+                if master_arr[0, row, colmn] == 0:
+                    for depths in range(1, pz_size + 1):
+                        if master_arr[depths, row, colmn] != 0:
+                            options += 1
+                            options_list.append(depths)
+                if options == 1:
+                    updates += 1
+                    master_arr[:, row, colmn] = options_list[0]
+                    update_puzzle(pz_size, master_arr)
+                    print(master_arr[0, :, :])
+    repeats+=1
+    print(repeats)
+print("-----------\n")
+print(master_arr[:, :, :])
