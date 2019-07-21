@@ -87,6 +87,7 @@ options = 0
 options_list = []
 updates = 0
 repeats = 0
+<<<<<<< Updated upstream
 while 0 in master_arr[0,:,:]:
     for num in range(1, pz_size + 1):
         for row in range(pz_size):  # rows 1,4/9
@@ -104,6 +105,32 @@ while 0 in master_arr[0,:,:]:
                     update_puzzle(pz_size, master_arr)
                     print(master_arr[0, :, :])
     repeats+=1
+=======
+while 0 in master_arr[0, :, :] and repeats < 1:
+    for row in range(pz_size):  # rows 1,4/9
+        for colmn in range(pz_size):
+            options = 0
+            options_list=[]
+            if master_arr[0, row, colmn] == 0:
+                for depths in range(1, pz_size + 1):
+                    if master_arr[depths, row, colmn] != 0:
+                        options += 1
+                        options_list.append(depths)
+            if options == 1:
+                updates += 1
+                master_arr[:, row, colmn] = options_list[0]
+                update_puzzle(pz_size, master_arr)
+                print(master_arr[0, :, :])
+            elif options > 1:
+                for depths in options_list:  # run through each option
+                    if np.count_nonzero(master_arr[depths, row,:] == depths) == 1:  # if for a given option, say 3, this location is the only possible location for 3 in the row then you have to add it
+                        updates += 1
+                        master_arr[:, row, colmn] = depths
+                        update_puzzle(pz_size, master_arr)
+                        # print(master_arr[0,:,:])
+
+    repeats += 1
+>>>>>>> Stashed changes
     print(repeats)
 print("-----------\n")
 print(master_arr[:, :, :])
