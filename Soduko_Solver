@@ -109,14 +109,13 @@ while 0 in master_arr[0, :, :] and repeats < 1:
                 print(master_arr[0, :, :])
             elif options > 1:
                 for depths in options_list:  # run through each option
-                    if np.count_nonzero(master_arr[depths, row,
-                                        :] == depths) == 1:  # if for a given option, say 3, this location is the only possible location for 3 in the row then you have to add it
+                    if np.count_nonzero(master_arr[depths, row,:] == depths) == 1:  # if for a given option, say 3, this location is the only possible location for 3 in the row then you have to add it
                         updates += 1
                         master_arr[:, row, colmn] = depths
                         update_puzzle(pz_size, master_arr)
                         # print(master_arr[0,:,:])
-
     repeats += 1
     print(repeats)
 print("-----------\n")
 print(master_arr[:, :, :])
+
