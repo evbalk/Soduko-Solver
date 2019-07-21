@@ -1,5 +1,5 @@
 import numpy as np
-#hello?
+
 # easy 4X4
 # puzzle = np.array([(0, 0, 4, 0), (1, 0, 0, 0), (0, 2, 0, 0), (0, 0, 0, 3)])
 
