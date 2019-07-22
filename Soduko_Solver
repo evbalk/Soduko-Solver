@@ -1,5 +1,7 @@
 import numpy as np
 
+record_sheet = open("changes_log1.txt", "w")
+
 # easy 4X4
 # puzzle = np.array([(0, 0, 4, 0), (1, 0, 0, 0), (0, 2, 0, 0), (0, 0, 0, 3)])
 
@@ -83,7 +85,11 @@ def update_puzzle(size, puzzle_array):
                                 puzzle_array[i, rw, col] = i
     return puzzle_array
 
-
+def log_changes(log_array, depthS, master_array, textfile,size):
+    textfile.write((str(log_array[-1]) + "\n"))
+    for i in range(size):
+        textfile.write(str(master_array[depthS, i, :])+ " "+str(master_array[0,i,:])+ " "+str(master_array[9,i,:])+ "\n")
+    textfile.write("\n")
 
 '''Run through depth 0 until no zeros are present. Moves across col, then down rows, then through numbers'''
 # update_master(pz_size,master_arr)
@@ -111,26 +117,30 @@ while 0 in master_arr[0, :, :] and repeats < 20 and changes1 != changes2: # runs
                         options += 1
                         options_list.append(depths)
             if options == 1:  # if only one option then update
+                changes_list.append((options_list[0], (row, colmn), "easy"))
+                log_changes(changes_list,options_list[0],master_arr,record_sheet,pz_size)
                 updates += 1
                 master_arr[:, row, colmn] = options_list[0]
                 update_puzzle(pz_size, master_arr)
-                changes_list.append((options_list[0],(row,colmn),"easy"))
+
             elif options > 1:  # if multiple options
                 run_through = 0
                 while run_through < len(options_list):
                     for depths1 in options_list:  # run through each option
                         if np.count_nonzero(master_arr[depths1, row,:] == depths1) == 1:  # if for a given option, say 3, this location is the only possible location for 3 in the row then you have to add it
+                            changes_list.append((depths1, (row, colmn), "row"))
+                            log_changes(changes_list, depths1, master_arr, record_sheet, pz_size)
                             updates += 1
                             master_arr[:, row, colmn] = depths1
                             update_puzzle(pz_size, master_arr)
-                            changes_list.append((depths1, (row, colmn),"row"))
                             pullout = True
                             break
                         elif np.count_nonzero(master_arr[depths1, :, colmn] == depths1) == 1: # code breaks when using this
+                            changes_list.append((depths1, (row, colmn), "colmn"))
+                            log_changes(changes_list, depths1, master_arr, record_sheet, pz_size)
                             updates += 1
                             master_arr[:, row, colmn] = depths1
                             update_puzzle(pz_size, master_arr)
-                            changes_list.append((depths1, (row, colmn),"colmn"))
                             pullout = True
                             break
                         run_through+=1
@@ -146,3 +156,5 @@ print("-----------\n")
 for i in changes_list:
     print(i)
 print(master_arr[:,:,:])
+
+record_sheet.close()
