@@ -143,6 +143,27 @@ while 0 in master_arr[0, :, :] and repeats < 20 and changes1 != changes2: # runs
                             update_puzzle(pz_size, master_arr)
                             pullout = True
                             break
+                        else: # check if only spot in square
+                            num_in_box=0
+                            check_square = which_square(row,colmn,square_divy)
+                            loc_in_sqaure =[]
+                            for r in range(pz_size):
+                                for c in range(pz_size):
+                                    if square_divy[r,c]==check_square:
+                                        loc_in_sqaure.append((r,c))
+                            for loc in loc_in_sqaure:
+                                row_l,col_l = loc
+                                if master_arr[depths1,row_l,col_l]==depths1:
+                                    num_in_box+=1
+                            if num_in_box==1:
+                                changes_list.append((depths1, (row, colmn), "box"))
+                                log_changes(changes_list, depths1, master_arr, record_sheet, pz_size)
+                                updates += 1
+                                master_arr[:, row, colmn] = depths1
+                                update_puzzle(pz_size, master_arr)
+                                pullout = True
+                                break
+
                         run_through+=1
                     if pullout is True: break
         if pullout is True: break
