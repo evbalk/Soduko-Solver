@@ -84,6 +84,7 @@ def update_puzzle(size, puzzle_array):
     return puzzle_array
 
 
+
 '''Run through depth 0 until no zeros are present. Moves across col, then down rows, then through numbers'''
 # update_master(pz_size,master_arr)
 update_puzzle(pz_size, master_arr)
@@ -98,8 +99,10 @@ changes_list = []
 while 0 in master_arr[0, :, :] and repeats < 20 and changes1 != changes2: # runs while there are empty spots or 81 iterations or there is no change
     if repeats==0: changes2 =0
     changes1 = changes2
+    pullout = False
     for row in range(pz_size):  # rows 1,4/9
-        for colmn in range(pz_size):  # col 1-9
+        for colmn in range(pz_size):
+            # col 1-9
             options = 0
             options_list = []
             if master_arr[0, row, colmn] == 0:  # if this spot is empty in depth 0
@@ -120,15 +123,19 @@ while 0 in master_arr[0, :, :] and repeats < 20 and changes1 != changes2: # runs
                             updates += 1
                             master_arr[:, row, colmn] = depths1
                             update_puzzle(pz_size, master_arr)
-                            options_list.remove(depths1)
                             changes_list.append((depths1, (row, colmn),"row"))
+                            pullout = True
+                            break
                         elif np.count_nonzero(master_arr[depths1, :, colmn] == depths1) == 1: # code breaks when using this
                             updates += 1
                             master_arr[:, row, colmn] = depths1
                             update_puzzle(pz_size, master_arr)
-                            options_list.remove(depths1)
                             changes_list.append((depths1, (row, colmn),"colmn"))
-                        run_through += 1
+                            pullout = True
+                            break
+                        run_through+=1
+                    if pullout is True: break
+        if pullout is True: break
 
     changes2 = updates
     print("Iteration:", repeats)
@@ -138,3 +145,4 @@ while 0 in master_arr[0, :, :] and repeats < 20 and changes1 != changes2: # runs
 print("-----------\n")
 for i in changes_list:
     print(i)
+print(master_arr[:,:,:])
