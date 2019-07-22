@@ -88,7 +88,7 @@ def update_puzzle(size, puzzle_array):
 def log_changes(log_array, depthS, master_array, textfile,size):
     textfile.write((str(log_array[-1]) + "\n"))
     for i in range(size):
-        textfile.write(str(master_array[depthS, i, :])+ " "+str(master_array[0,i,:])+ " "+str(master_array[9,i,:])+ "\n")
+        textfile.write(str(master_array[depthS, i, :])+ " "+str(master_array[0,i,:])+ "\n")
     textfile.write("\n")
 
 '''Run through depth 0 until no zeros are present. Moves across col, then down rows, then through numbers'''
