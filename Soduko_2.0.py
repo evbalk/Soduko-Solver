@@ -15,7 +15,8 @@ assert l == 9, "Puzzle is not 9x9"
 '''Set range of numbers in puzzle'''
 pz_size = 9
 
-#creates 9x9 array where each location holds its box number
+
+# creates 9x9 array where each location holds its box number
 def square_boundaries(size):
     loc_arr = np.zeros((size, size))
     sqrt = int((size) ** (1 / 2))
@@ -24,7 +25,8 @@ def square_boundaries(size):
             loc_arr[r, c] = c // sqrt + sqrt * (r // sqrt)
     return loc_arr
 
-#returns list of (r,c) that are in the same box as the given r,c
+
+# returns list of (r,c) that are in the same box as the given r,c
 def return_locs_in_box(row, column):
     correspond = square_boundaries(9)  # get 9x9 matrix which contains box layout
     my_box = correspond[row, column]  # get the box for this r,c
@@ -35,38 +37,40 @@ def return_locs_in_box(row, column):
                 output_list.append((r, c))  # append those that share the same box value as tuple(r,c)
     return output_list
 
-#clears a number from its corresponding candidates matrix row
+
+# clears a number from its corresponding candidates matrix row
 def clear_row(number, row, array_to_clear, exceptions=[]):
     for i in range(9):
         if i not in exceptions:
             array_to_clear[number, row, i] = 0
 
-#clears a number from its corresponding candidates matrix column
+
+# clears a number from its corresponding candidates matrix column
 def clear_column(number, column, array_to_clear, exceptions=[]):
     for i in range(9):
         if i not in exceptions:
             array_to_clear[number, i, column] = 0
 
-#clears a number from its corresponding candidates matrix box
+
+# clears a number from its corresponding candidates matrix box
 def clear_box(number, row, column, array_to_clear):
     for location in return_locs_in_box(row, column):
         r, c = location
         array_to_clear[number, r, c] = 0
 
-#when a number is solved, have to update puzzle and candidate layers
-def update_whole(number,row,column,array_to_update):
-    array_to_update[0,row,column]=number
-    array_to_update[number,row,column]=0
-    clear_row(number,row,array_to_update)
-    clear_column(number,column,array_to_update)
-    clear_box(number,row,column,array_to_update)
 
-
+# when a number is solved, have to update puzzle and candidate layers
+def update_whole(number, row, column, array_to_update):
+    array_to_update[0, row, column] = number
+    array_to_update[number, row, column] = 0
+    clear_row(number, row, array_to_update)
+    clear_column(number, column, array_to_update)
+    clear_box(number, row, column, array_to_update)
 
 
 square_divvy = square_boundaries(pz_size)
-
-master_arr = np.zeros((pz_size + 1, pz_size, pz_size))
+# 0 is the actual puzzle, 1-9 are candidate matrices, 10 contains total number of candidates in 
+master_arr = np.zeros((pz_size + 2, pz_size, pz_size))
 master_arr = master_arr.astype(int)
 master_arr[0, :, :] = puzzle
 
@@ -87,13 +91,30 @@ for i in range(1, 9):
             clear_row(i, r, master_arr)
     for c in range(9):
         if i in master_arr[0, :, c]:
-            print("%d is in column %d" % (i, c))
             clear_column(i, c, master_arr)
 
 # remove illegal candidates on the basis of their box membership
-#for
+for r in range(9):
+    for c in range(9):
+        if master_arr[0, r, c] != 0:
+            clear_box(master_arr[0, r, c], r, c, master_arr)
 
 
+# generates an array that stores the number of candidates in each position
+def candidates_count(array_to_check):
+    output = np.zeros((9, 9))
+    count = 0
+    for r in range(9):
+        for c in range(9):
+            for i in range(1, 9):
+                if array_to_check[i, c, r] != 0:
+                    count += 1
+            output[r, c] = count
+            count = 0
+    return output
+
+def naked_singles(row, column):
+    return
 
 
 record_sheet.close()
