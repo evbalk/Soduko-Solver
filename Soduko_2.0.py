@@ -91,5 +91,9 @@ for i in range(1, 9):
             clear_column(i, c, master_arr)
 
 # remove illegal candidates on the basis of their box membership
-for  
+#for
 
+
+
+
+record_sheet.close()
