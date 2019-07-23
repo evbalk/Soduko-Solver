@@ -2,10 +2,17 @@ import numpy as np
 
 record_sheet = open("changes_log2.txt", "w")
 
+# easy
 puzzle = np.array(
+    [(0, 0, 1, 0, 8, 3, 0, 7, 6), (0, 7, 0, 4, 0, 0, 2, 1, 0), (6, 0, 9, 0, 0, 0, 0, 8, 0), (5, 4, 3, 0, 9, 1, 0, 6, 0),
+     (2, 0, 0, 8, 5, 0, 7, 0, 9), (0, 0, 8, 6, 3, 0, 0, 4, 5), (9, 5, 0, 0, 7, 0, 0, 0, 1), (3, 0, 0, 2, 0, 5, 4, 0, 0),
+     (1, 8, 2, 0, 0, 6, 3, 0, 0)])
+
+# hard
+'''puzzle = np.array(
     [(0, 0, 0, 0, 0, 0, 6, 8, 0), (0, 0, 0, 0, 7, 3, 0, 0, 9), (3, 0, 9, 0, 0, 0, 0, 4, 5), (4, 9, 0, 0, 0, 0, 0, 0, 0),
      (8, 0, 3, 0, 5, 0, 9, 0, 2), (0, 0, 0, 0, 0, 0, 0, 3, 6), (9, 6, 0, 0, 0, 0, 3, 0, 8), (7, 0, 0, 6, 8, 0, 0, 0, 0),
-     (0, 2, 8, 0, 0, 0, 0, 0, 0)])
+     (0, 2, 8, 0, 0, 0, 0, 0, 0)])'''
 
 '''Check to see if array is square, not 0x0'''
 l, w = np.shape(puzzle)
@@ -69,7 +76,7 @@ def update_whole(number, row, column, array_to_update):
 
 
 square_divvy = square_boundaries(pz_size)
-# 0 is the actual puzzle, 1-9 are candidate matrices, 10 contains total number of candidates in 
+# 0 is the actual puzzle, 1-9 are candidate matrices, 10 contains total number of candidates in
 master_arr = np.zeros((pz_size + 2, pz_size, pz_size))
 master_arr = master_arr.astype(int)
 master_arr[0, :, :] = puzzle
@@ -107,14 +114,39 @@ def candidates_count(array_to_check):
     for r in range(9):
         for c in range(9):
             for i in range(1, 9):
-                if array_to_check[i, c, r] != 0:
+                if array_to_check[i, r, c] != 0:
                     count += 1
             output[r, c] = count
             count = 0
     return output
 
-def naked_singles(row, column):
-    return
 
+master_arr[10, :, :] = candidates_count(master_arr)
+
+
+# creates a list
+def unsolved_list(the_array):
+    output_list = []
+    for r in range(9):
+        for c in range(9):
+            if master_arr[10, r, c] != 0:
+                output_list.append((r, c))
+    return output_list
+
+
+still_to_solve = unsolved_list(master_arr)
+
+# actual loop
+updates = 0
+while 0 in master_arr[0]:
+    for entry in still_to_solve:  # need to fix this idea of unsolved list
+        r, c = entry
+        add_this = 0
+        if master_arr[10, r, c] == 1:
+            add_this = np.max(master_arr[:, r, c])
+            update_whole(add_this, r, c, master_arr)
+            still_to_solve.remove(entry)
+            updates += 1
+            break
 
 record_sheet.close()
