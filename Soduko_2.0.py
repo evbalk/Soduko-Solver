@@ -26,7 +26,7 @@ pz_size = 9
 # creates 9x9 array where each location holds its box number
 def square_boundaries(size):
     loc_arr = np.zeros((size, size))
-    sqrt = int((size) ** (1 / 2))
+    sqrt = int(size ** (1 / 2))
     for r in range(size):
         for c in range(size):
             loc_arr[r, c] = c // sqrt + sqrt * (r // sqrt)
@@ -43,6 +43,9 @@ def return_locs_in_box(row, column):
             if correspond[r, c] == my_box:  # run through each r,c (81) and figure out which have the same box value
                 output_list.append((r, c))  # append those that share the same box value as tuple(r,c)
     return output_list
+
+
+print(return_locs_in_box(5, 1))
 
 
 # clears a number from its corresponding candidates matrix row
@@ -73,6 +76,8 @@ def update_whole(number, row, column, array_to_update):
     clear_row(number, row, array_to_update)
     clear_column(number, column, array_to_update)
     clear_box(number, row, column, array_to_update)
+    master_arr[10] = candidates_count(array_to_update)
+    print(number, (row, column))
 
 
 square_divvy = square_boundaries(pz_size)
@@ -82,7 +87,7 @@ master_arr = master_arr.astype(int)
 master_arr[0, :, :] = puzzle
 
 # initialize the candidate matrices
-for i in range(1, 9):
+for i in range(1, 10):
     master_arr[i, :, :] = i
 
 # remove candidates in spot that have been solved for
@@ -92,7 +97,7 @@ for r in range(9):
             master_arr[1:, r, c] = 0
 
 # remove candidates based on interference from solved spots in terms of row and column
-for i in range(1, 9):
+for i in range(1, 10):
     for r in range(9):
         if i in master_arr[0, r]:
             clear_row(i, r, master_arr)
@@ -113,7 +118,7 @@ def candidates_count(array_to_check):
     count = 0
     for r in range(9):
         for c in range(9):
-            for i in range(1, 9):
+            for i in range(1, 10):
                 if array_to_check[i, r, c] != 0:
                     count += 1
             output[r, c] = count
@@ -138,15 +143,50 @@ still_to_solve = unsolved_list(master_arr)
 
 # actual loop
 updates = 0
-while 0 in master_arr[0]:
+repeats = 0
+while 0 in master_arr[0] and repeats < 81:
     for entry in still_to_solve:  # need to fix this idea of unsolved list
         r, c = entry
         add_this = 0
         if master_arr[10, r, c] == 1:
-            add_this = np.max(master_arr[:, r, c])
+            add_this = np.max(master_arr[1:, r, c])
             update_whole(add_this, r, c, master_arr)
             still_to_solve.remove(entry)
             updates += 1
-            break
+        else:
+            # check naked pairs
+            if master_arr[10, r, c] == 2:
+                pair = []
+                check_pair = []
+                pair_exists = False
+                col_to_check = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+                row_to_check = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+                for number in master_arr[:9, r, c]:
+                    if number != 0:  # get the pair of numbers that we are checking for
+                        pair.append(number)
+                col_to_check.remove(c)
+                # pair = np.nonzero(master_arr[:9,r,c])
+
+                # check if they occur in same row
+                for col in col_to_check:  # check each col in row
+                    # if this col only has two possibilities and they are the designated pair
+                    if master_arr[10, r, col] == 2 and (
+                            master_arr[pair[0], r, col] != 0 and master_arr[pair[1], r, col] != 0):
+                        clear_row(pair[0], r, master_arr, [c, col])
+                        clear_row(pair[1], r, master_arr, [c, col])  # remove these numbers from the rest of the row
+
+                # check if they occur in same col
+                for row in row_to_check:  # check each col in row
+                    # if this row only has two possibilities and they are the designated pair
+                    if master_arr[10, row, c] == 2 and (
+                            master_arr[pair[0], row, c] != 0 and master_arr[pair[1], row, c] != 0):
+                        clear_column(pair[0], c, master_arr, [r, row])
+                        clear_column(pair[1], c, master_arr, [r, row])  # remove these numbers from the rest of the col
+
+                # check if pair exists in same box
+
+
+            # check hidden pairs
+    repeats += 1
 
 record_sheet.close()
