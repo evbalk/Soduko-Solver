@@ -83,7 +83,7 @@ def update_whole(number, row, column, array_to_update):
 
 square_divvy = square_boundaries(pz_size)
 # 0 is the actual puzzle, 1-9 are candidate matrices, 10 contains total number of candidates in
-master_arr = np.zeros((pz_size + 2, pz_size, pz_size))
+master_arr = np.zeros((pz_size + 3, pz_size, pz_size))
 master_arr = master_arr.astype(int)
 master_arr[0, :, :] = puzzle
 
@@ -156,6 +156,27 @@ def get_candidates(type, num, array_to_check):
                     temp.append(depth)
             output_list.append((row, temp))
     return output_list
+
+
+def get_candidates2(array):
+    for i in range(1, 10):  # 1-4/9
+        for rw in range(9):
+            for col in range(9):
+                candidates=[]
+                if array[0, rw, col] == 0:  # is the specific location not already occupied/solved
+                    if i not in array[0, rw, :]:  # checks rows for the number
+                        if i not in array[0, :, col]:  # checks each column for the number
+                            shared_box = return_locs_in_box(rw, col)
+                            in_box = False
+                            for entry in shared_box:
+                                r1, c1 = entry
+                                if array[0, r1, c1] == i:
+                                    in_box = True
+                            if in_box is False:
+                                array[11, rw, col] = i
+
+
+get_candidates2(master_arr)
 
 
 # creates a list
