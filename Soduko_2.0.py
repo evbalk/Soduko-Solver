@@ -1,18 +1,19 @@
 import numpy as np
+import numpy.ma as ma
 
 record_sheet = open("changes_log2.txt", "w")
 
 # easy
-puzzle = np.array(
+'''puzzle = np.array(
     [(0, 0, 1, 0, 8, 3, 0, 7, 6), (0, 7, 0, 4, 0, 0, 2, 1, 0), (6, 0, 9, 0, 0, 0, 0, 8, 0), (5, 4, 3, 0, 9, 1, 0, 6, 0),
      (2, 0, 0, 8, 5, 0, 7, 0, 9), (0, 0, 8, 6, 3, 0, 0, 4, 5), (9, 5, 0, 0, 7, 0, 0, 0, 1), (3, 0, 0, 2, 0, 5, 4, 0, 0),
-     (1, 8, 2, 0, 0, 6, 3, 0, 0)])
+     (1, 8, 2, 0, 0, 6, 3, 0, 0)])'''
 
 # hard
-'''puzzle = np.array(
+puzzle = np.array(
     [(0, 0, 0, 0, 0, 0, 6, 8, 0), (0, 0, 0, 0, 7, 3, 0, 0, 9), (3, 0, 9, 0, 0, 0, 0, 4, 5), (4, 9, 0, 0, 0, 0, 0, 0, 0),
      (8, 0, 3, 0, 5, 0, 9, 0, 2), (0, 0, 0, 0, 0, 0, 0, 3, 6), (9, 6, 0, 0, 0, 0, 3, 0, 8), (7, 0, 0, 6, 8, 0, 0, 0, 0),
-     (0, 2, 8, 0, 0, 0, 0, 0, 0)])'''
+     (0, 2, 8, 0, 0, 0, 0, 0, 0)])
 
 '''Check to see if array is square, not 0x0'''
 l, w = np.shape(puzzle)
@@ -129,12 +130,31 @@ def candidates_count(array_to_check):
 master_arr[10, :, :] = candidates_count(master_arr)
 
 
+# given a row or column, return a list which contains the candidates in each column or row
 def get_candidates(type, num, array_to_check):
     output_list = []
+    temp = []
+    # stupid way
     if type == "row":
-        output_list = np.nonzero(array_to_check[:9, num])
+        for col in range(9):
+            temp = []
+            for depth in range(1, 10):
+                if array_to_check[depth, num, col] != 0:
+                    temp.append(depth)
+            output_list.append((col, temp))
+    '''if type == "row": #comeback for later
+        for j in range(9):
+            a = []
+            a = ma.masked_equal(array_to_check[:, num, j], 0)
+            b = a[~a.mask]
+            output_list[j] = b'''
     if type == "col":
-        output_list = np.nonzero(array_to_check[:9, :, num])
+        for row in range(9):
+            temp = []
+            for depth in range(1, 10):
+                if array_to_check[depth, row, cum] != 0:
+                    temp.append(depth)
+            output_list.append((row, temp))
     return output_list
 
 
@@ -147,8 +167,9 @@ def unsolved_list(the_array):
                 output_list.append((r, c))
     return output_list
 
-test = get_candidates("row", 1, master_arr)
-print(type(test))
+
+test = get_candidates("got", 1, master_arr)
+print(test)
 still_to_solve = unsolved_list(master_arr)
 
 # actual loop
