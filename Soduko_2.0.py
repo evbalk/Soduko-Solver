@@ -129,6 +129,15 @@ def candidates_count(array_to_check):
 master_arr[10, :, :] = candidates_count(master_arr)
 
 
+def get_candidates(type, num, array_to_check):
+    output_list = []
+    if type == "row":
+        output_list = np.nonzero(array_to_check[:9, num])
+    if type == "col":
+        output_list = np.nonzero(array_to_check[:9, :, num])
+    return output_list
+
+
 # creates a list
 def unsolved_list(the_array):
     output_list = []
@@ -138,13 +147,14 @@ def unsolved_list(the_array):
                 output_list.append((r, c))
     return output_list
 
-
+test = get_candidates("row", 1, master_arr)
+print(type(test))
 still_to_solve = unsolved_list(master_arr)
 
 # actual loop
 updates = 0
 repeats = 0
-while 0 in master_arr[0] and repeats < 81:
+'''while 0 in master_arr[0] and repeats < 81:
     for entry in still_to_solve:  # need to fix this idea of unsolved list
         r, c = entry
         add_this = 0
@@ -187,6 +197,6 @@ while 0 in master_arr[0] and repeats < 81:
 
 
             # check hidden pairs
-    repeats += 1
+    repeats += 1'''
 
 record_sheet.close()
